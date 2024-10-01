@@ -34,13 +34,13 @@ En l'état, ne fonctionne qu'avec un OS en version française.
 3. Ajoutez un appel au script dans votre fichier de configuration de shell (`.bashrc`, `.zshrc`, etc.) :
 
     ```sh
-    echo '~/chemin/vers/votre-depot/check-updates.sh' >> ~/.bashrc
+    echo '~/chemin/vers/le-script/check-updates-debian-like/check-updates.sh' >> ~/.bashrc
     ```
 
     ou
 
     ```sh
-    echo '~/chemin/vers/votre-depot/check-updates.sh' >> ~/.zshrc
+    echo '~/chemin/vers/le-script/check-updates-debian-like/check-updates.sh' >> ~/.zshrc
     ```
 
     Remplacez `~/chemin/vers/votre-depot/check-updates.sh` par le chemin réel vers le script.
