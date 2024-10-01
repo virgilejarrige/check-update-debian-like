@@ -20,7 +20,7 @@ En l'état, ne fonctionne qu'avec un OS en version française.
 1. Clonez ce dépôt :
 
     ```sh
-    git clone [https://github.com/votre-utilisateur/votre-depot.git](https://github.com/virgilejarrige/check-updates-debian-like.git)
+    git clone https://github.com/virgilejarrige/check-updates-debian-like.git
     
     cd check-updates-debian-like
     ```
