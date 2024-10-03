@@ -62,7 +62,7 @@ En l'état, ne fonctionne qu'avec un OS en version française.
 
 Le script sera exécuté automatiquement à chaque ouverture de session. Il vérifiera les mises à jour disponibles et affichera les résultats.
 
-### Options de ligne de commande
+### Options de ligne de commande en cas d'utilisation manuelle
 
 - `-f`, `--force` : Force la vérification des mises à jour.
 - `-s`, `--show` : Affiche les mises à jour disponibles sans les installer.
