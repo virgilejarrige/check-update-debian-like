@@ -63,11 +63,27 @@ Le script sera exécuté automatiquement à chaque ouverture de session. Il vér
 
 ## Configuration
 
-Vous pouvez modifier le délai de vérification des mises à jour en modifiant la variable `check_update_delay` dans le script. Par défaut, le délai est de 3 jours.
+Lors de la première exécution, le script vous demandera de définir le nombre de jours entre chaque vérification. Cette configuration sera sauvegardée dans `~/.check-updates` pour les futures exécutions.
 
-## Note sur "doas"
+Vous pouvez choisir d'être rappelé ou non des mises à jour disponibles lors de chaque exécution du script.
 
-Si vous utilisez doas et que vous souhaitez éviter d'entrer votre mot de passe à chaque fois que la vérification est faite, vous pouvez éditer votre fichier /etc/doas.conf en ajoutant la ligne : 
+Si vous souhaitez modifier le délais entre les vérifications de mises à jour, il faut effacer le fichier `~/.check-kupdates` et relancer le script manuellement :
+
+    ```sh
+    rm ~/.check-updates && source ~/.bashrc
+    ```
+    
+    ou
+
+    ```sh
+    rm ~/.check-updates && source ~/.zshrc
+    ```
+
+## Remarques
+
+- Le script nécessite les privilèges sudo ou doas pour effectuer les mises à jour.
+- Il est conçu pour fonctionner avec apt-get et apt, donc principalement pour les systèmes Debian/Ubuntu.
+- Si vous utilisez doas et que vous souhaitez éviter d'entrer votre mot de passe à chaque fois que la vérification est faite, vous pouvez éditer votre fichier /etc/doas.conf en ajoutant la ligne : 
 
 ```sh
 permit nopass votre-utilisateur as root cmd apt-get update
