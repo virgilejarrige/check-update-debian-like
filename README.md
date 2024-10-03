@@ -9,6 +9,7 @@ En l'état, ne fonctionne qu'avec un OS en version française.
 - Utilise `doas` si disponible, sinon utilise `sudo`.
 - Vérifie les mises à jour à intervalles réguliers (nombre de jours défini par l'utilisateur).
 - Affiche le nombre de mises à jour disponibles et les détails des paquets pouvant être mis à jour.
+- possibilité d'ajuster certain paramètres avec des options de ligne de commande (voir plus bas)
 
 ## Prérequis
 
@@ -60,6 +61,15 @@ En l'état, ne fonctionne qu'avec un OS en version française.
 ## Utilisation
 
 Le script sera exécuté automatiquement à chaque ouverture de session. Il vérifiera les mises à jour disponibles et affichera les résultats.
+
+### Options de ligne de commande
+
+- `-f`, `--force` : Force la vérification des mises à jour.
+- `-s`, `--show` : Affiche les mises à jour disponibles sans les installer.
+- `-i`, `--install` : Force la vérification et installe les mises à jour lorsque le délai est écoulé.
+- `-d`, `--delay DAYS` : Spécifie le délai en jours entre chaque vérification des mises à jour.
+- `-r`, `--reset` : Réinitialise le fichier de configuration.
+- `-h`, `--help` : Affiche le message d'aide.
 
 ## Configuration
 
