@@ -7,7 +7,7 @@ En l'état, ne fonctionne qu'avec un OS en version française.
 
 - Vérifie les mises à jour disponibles via `apt-get`.
 - Utilise `doas` si disponible, sinon utilise `sudo`.
-- Vérifie les mises à jour à intervalles réguliers (par défaut tous les 3 jours).
+- Vérifie les mises à jour à intervalles réguliers (nombre de jours défini par l'utilisateur).
 - Affiche le nombre de mises à jour disponibles et les détails des paquets pouvant être mis à jour.
 
 ## Prérequis
