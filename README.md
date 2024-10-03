@@ -69,15 +69,15 @@ Vous pouvez choisir d'être rappelé ou non des mises à jour disponibles lors d
 
 Si vous souhaitez modifier le délais entre les vérifications de mises à jour, il faut effacer le fichier `~/.check-kupdates` et relancer le script manuellement :
 
-    ```sh
-    rm ~/.check-updates && source ~/.bashrc
-    ```
+   ```sh
+   rm ~/.check-updates && source ~/.bashrc
+   ```
     
-    ou
+   ou
 
-    ```sh
-    rm ~/.check-updates && source ~/.zshrc
-    ```
+   ```sh
+   rm ~/.check-updates && source ~/.zshrc
+   ```
 
 ## Remarques
 
