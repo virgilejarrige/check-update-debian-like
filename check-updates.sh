@@ -1,6 +1,71 @@
 #!/bin/bash
 
 check_file="$HOME/.check-updates"
+force_check=false
+show_updates=false
+install_updates_flag=false
+delay_option=""
+reset_flag=false
+
+# Fonction pour afficher l'aide
+show_help() {
+    echo "Usage: $0 [options]"
+    echo "Options:"
+    echo "  -f, --force       Force la vérification des mises à jour."
+    echo "  -s, --show        Affiche les mises à jour disponibles sans les installer."
+    echo "  -i, --install     Force la vérification et installe les mises à jour lorsque le délai est écoulé."
+    echo "  -d, --delay DAYS  Spécifie le délai en jours entre chaque vérification des mises à jour."
+    echo "  -r, --reset       Réinitialise le fichier de configuration."
+    echo "  -h, --help        Affiche ce message d'aide."
+}
+
+# Analyse des options de ligne de commande
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -f|--force)
+            force_check=true
+            shift
+            ;;
+        -s|--show)
+            show_updates=true
+            shift
+            ;;
+        -i|--install)
+            install_updates_flag=true
+            shift
+            ;;
+        -d|--delay)
+            if [ -z "$2" ]; then
+                echo "Erreur : Veuillez spécifier le nombre de jours pour l'option -d."
+                exit 1
+            fi
+            delay_option="$2"
+            if [[ "$delay_option" =~ ^[0-9]+$ ]]; then
+                echo "Mise à jour du délai entre chaque vérification effectuée."
+                echo "$delay_option" > "$check_file"
+                echo "1" >> "$check_file"  # Par défaut, installer automatiquement
+                echo "0" >> "$check_file"  # 0 = ne pas rappeler
+                exit 0
+            else
+                echo "Erreur : Le délai doit être un nombre entier."
+                exit 1
+            fi
+            ;;
+        -r|--reset)
+            reset_flag=true
+            shift
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        *)
+            echo "Option inconnue: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+done
 
 get_delay() {
     local delay=""
@@ -77,6 +142,10 @@ check_updates() {
         echo -e "\n$updates_available mise(s) à jour disponible(s) :"
         echo "$updates_output"
 
+        if [ "$show_updates" = true ]; then
+            return 0
+        fi
+
         while true; do
             read -p "Appliquer les mises à jour O/N (N par défaut) ? " response
             case $response in
@@ -123,8 +192,20 @@ check_file() {
     local is_new=$(echo $delay_info | cut -d':' -f2)
 
     if [ "$is_new" = "true" ] || [ ! -f "$check_file" ] || [ $(wc -l < "$check_file") -lt 3 ]; then
-        # echo "Nouveau fichier de configuration créé."
-        echo "1" >> "$check_file"  # Par défaut, on rappelle
+        read -p "Souhaitez-vous que le script installe automatiquement les mises à jour lorsque le délai est écoulé ? (O/N, N par défaut) " auto_install
+        case $auto_install in
+            [Oo]* )
+                echo "1" >> "$check_file"  # 1 = installer automatiquement
+                ;;
+            [Nn]* | "" )
+                echo "0" >> "$check_file"  # 0 = ne pas installer automatiquement
+                ;;
+            * )
+                echo "Veuillez répondre par O ou N."
+                exit 1
+                ;;
+        esac
+        echo "0" >> "$check_file"  # 0 = ne pas rappeler
         check_updates
     else
         local timestamp=$(date +%s)
@@ -132,15 +213,14 @@ check_file() {
         local file_timestamp=$(stat -c %Y "$check_file")
         local next_check=$(($file_timestamp + $delay_in_seconds))
         local remind_flag=$(sed -n '3p' "$check_file")
+        local auto_install_flag=$(sed -n '2p' "$check_file")
 
-        # echo "Timestamp actuel : $timestamp"
-        # echo "Timestamp du fichier : $file_timestamp"
-        # echo "Prochaine vérification prévue pour : $next_check"
-        # echo "Drapeau de rappel : $remind_flag"
-
-        if [ "$timestamp" -ge "$next_check" ] || [ "$remind_flag" = "1" ]; then
+        if [ "$force_check" = true ] || [ "$timestamp" -ge "$next_check" ] || [ "$remind_flag" = "1" ]; then
             echo "Il est temps de vérifier les mises à jour."
             check_updates
+            if [ "$install_updates_flag" = true ] && [ "$auto_install_flag" = "1" ]; then
+                install_updates
+            fi
         else
             local days_remaining=$(( ($next_check - $timestamp) / (24 * 60 * 60) + 1 ))
             echo "Les mises à jour seront vérifiées dans $days_remaining jour(s)."
@@ -151,6 +231,12 @@ check_file() {
 if ! command -v apt-get >/dev/null 2>&1 || ! command -v apt >/dev/null 2>&1; then
     echo "Erreur : apt-get ou apt n'est pas disponible sur ce système."
     exit 1
+fi
+
+if [ "$reset_flag" = true ]; then
+    rm -f "$check_file"
+    echo "Fichier de configuration réinitialisé."
+    exit 0
 fi
 
 check_file
