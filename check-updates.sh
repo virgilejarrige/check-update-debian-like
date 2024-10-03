@@ -76,28 +76,30 @@ check_updates() {
     if [ "$updates_available" -gt 0 ]; then
         echo -e "\n$updates_available mise(s) à jour disponible(s) :"
         echo "$updates_output"
-        
+
         while true; do
             read -p "Appliquer les mises à jour O/N (N par défaut) ? " response
             case $response in
-                [Oo]* ) 
+                [Oo]* )
                     if install_updates; then
-                        sed -i "2c$(date +%s)" "$check_file"
+                        touch "$check_file"
+                        sed -i '3d' "$check_file" 2>/dev/null
+                        echo "0" >> "$check_file"  # 0 = ne pas rappeler
                         return 0
                     else
                         return 1
                     fi
                     ;;
-                [Nn]* | "" ) 
+                [Nn]* | "" )
                     echo "Mises à jour non installées."
                     read -p "Souhaitez-vous être rappelé lors de la prochaine exécution du script O/N (O par défaut) ? " remind
                     case $remind in
-                        [Nn]* ) 
-                            sed -i "2c$(date +%s)" "$check_file"
+                        [Nn]* )
+                            touch "$check_file"
                             sed -i '3d' "$check_file" 2>/dev/null
                             echo "0" >> "$check_file"  # 0 = ne pas rappeler
                             ;;
-                        * ) 
+                        * )
                             sed -i '3d' "$check_file" 2>/dev/null
                             echo "1" >> "$check_file"  # 1 = rappeler
                             ;;
@@ -109,7 +111,9 @@ check_updates() {
         done
     else
         echo "Aucune mise à jour disponible."
-        sed -i "2c$(date +%s)" "$check_file"
+        touch "$check_file"
+        sed -i '3d' "$check_file" 2>/dev/null
+        echo "0" >> "$check_file"  # 0 = ne pas rappeler
     fi
 }
 
@@ -119,16 +123,21 @@ check_file() {
     local is_new=$(echo $delay_info | cut -d':' -f2)
 
     if [ "$is_new" = "true" ] || [ ! -f "$check_file" ] || [ $(wc -l < "$check_file") -lt 3 ]; then
-        echo "$(date +%s)" >> "$check_file"
+        # echo "Nouveau fichier de configuration créé."
         echo "1" >> "$check_file"  # Par défaut, on rappelle
         check_updates
     else
         local timestamp=$(date +%s)
         local delay_in_seconds=$(($delay * 24 * 60 * 60))
-        local file_timestamp=$(sed -n '2p' "$check_file")
+        local file_timestamp=$(stat -c %Y "$check_file")
         local next_check=$(($file_timestamp + $delay_in_seconds))
         local remind_flag=$(sed -n '3p' "$check_file")
-        
+
+        # echo "Timestamp actuel : $timestamp"
+        # echo "Timestamp du fichier : $file_timestamp"
+        # echo "Prochaine vérification prévue pour : $next_check"
+        # echo "Drapeau de rappel : $remind_flag"
+
         if [ "$timestamp" -ge "$next_check" ] || [ "$remind_flag" = "1" ]; then
             echo "Il est temps de vérifier les mises à jour."
             check_updates
